@@ -1,34 +1,53 @@
 import pygame, sys
+import math
 from pygame.locals import *
 from config import *
 
 # Inicializa el juego
 pygame.init()
-
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
-# Background
-background = pygame.image.load("assets/layer_1.png").convert()
-background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
-
-x = 0
 
 
+#create game window
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("The Endlesss Scroll ")
 
-#Icono y titulo
-pygame.display.set_caption("The Dark Knight")
-icon = pygame.image.load("assets/idle_knight_1.png")
-pygame.display.set_icon(icon)
 
-while True:
+# Load Image
+bg = pygame.image.load("assets/bg.png").convert()
+[bg_width, bg_height] = bg.get_size()
+bg_rect = bg.get_rect()
+
+# game variables
+scroll = 0
+tiles = math.ceil(SCREEN_WIDTH / bg_width) + 1
+
+
+# game loop
+run = True
+while run:
+  clock.tick(FPS)
+
+  #drawing scrolling bg
+  for i in range(0, tiles):
+    screen.blit(bg,(i * bg_width + scroll,0))
+    bg_rect.x = i * bg_width + scroll
+    pygame.draw.rect(screen, (255, 0, 0), bg_rect, 1)
+
+  # scroll backgroundn
+  scroll -= 5
+
+  # Reset scroll
+  if abs(scroll) > bg_width:
+    scroll = 0  
+  
+  #event handler
   for event in pygame.event.get():
     if event.type == QUIT:
-      pygame.quit()
-      sys.exit()
-  relative_x = x % background.get_rect().width
-  screen.blit(background,(relative_x - background.get_rect().width, 0))
-  if relative_x < SCREEN_WIDTH:
-    screen.blit(background, (relative_x, 0))
-  x-=1
+      run = False
+  
   pygame.display.update()
-  clock.tick(FPS)
+  
+
+
+pygame.quit()
